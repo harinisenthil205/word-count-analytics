@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Analysis Results | WordWise{% endblock %}
+{% block content %}
+<section class="results-header">
+    <p class="eyebrow"><span class="status-dot"></span> ANALYSIS COMPLETE</p>
+    <h1>Your text, <span class="gradient-text">decoded.</span></h1>
+    <p>Here is the word-frequency summary for your dataset.</p>
+    <a class="text-link" href="{{ url_for('index') }}">← Analyze another dataset</a>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card"><span class="stat-icon purple">Aa</span><p>Total words</p><strong>{{ "{:,}".format(results.total_words) }}</strong><small>All word occurrences</small></article>
+    <article class="stat-card"><span class="stat-icon blue">#</span><p>Unique words</p><strong>{{ "{:,}".format(results.unique_words) }}</strong><small>Distinct word tokens</small></article>
+    <article class="stat-card"><span class="stat-icon green">↔</span><p>Characters</p><strong>{{ "{:,}".format(results.total_characters) }}</strong><small>Including spaces and punctuation</small></article>
+</section>
+
+<section class="results-panel chart-panel">
+    <div class="panel-heading"><div><p class="eyebrow">TOP 10 WORDS</p><h2>Most frequent words</h2></div><span class="tag">LIVE VISUALIZATION</span></div>
+    {% if results.top_words %}
+    <div class="chart-wrap"><canvas id="frequencyChart"></canvas></div>
+    {% else %}
+    <p>No words were found in this dataset.</p>
+    {% endif %}
+</section>
+
+<section class="results-panel">
+    <div class="panel-heading"><div><p class="eyebrow">FULL BREAKDOWN</p><h2>Word frequency table</h2></div><span class="tag">{{ results.unique_words }} unique terms</span></div>
+    <div class="table-scroll">
+        <table>
+            <thead><tr><th>#</th><th>Word</th><th>Frequency</th><th>Share of words</th></tr></thead>
+            <tbody>
+            {% for word, count in results.word_counts %}
+                <tr>
+                    <td class="muted">{{ loop.index }}</td>
+                    <td><span class="word-chip">{{ word }}</span></td>
+                    <td><strong>{{ count }}</strong></td>
+                    <td>
+                        <div class="share-cell">
+                            <div class="mini-track"><span style="width: {{ (count / results.total_words * 100) if results.total_words else 0 }}%"></span></div>
+                            <span>{{ "%.2f"|format((count / results.total_words * 100) if results.total_words else 0) }}%</span>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="download-row">
+        <p>Export the complete frequency table for your report.</p>
+        <button class="button button-primary" onclick="downloadCsv()">Download CSV ↓</button>
+    </div>
+</section>
+
+<script>
+const chartLabels = {{ results.top_words | map(attribute=0) | list | tojson }};
+const chartValues = {{ results.top_words | map(attribute=1) | list | tojson }};
+const ctx = document.getElementById('frequencyChart');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Word frequency',
+                data: chartValues,
+                backgroundColor: '#7667f4',
+                borderRadius: 7,
+                maxBarThickness: 42
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#edf0f6' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+function downloadCsv() {
+    const rows = [['Word', 'Frequency'], ...{{ results.word_counts | tojson }}];
+    const csv = rows.map(row => row.map(value => '"' + String(value).replaceAll('"', '""') + '"').join(',')).join('\r\n');
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'word_frequency.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+</script>
+{% endblock %}

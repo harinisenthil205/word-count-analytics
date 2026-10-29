@@ -1,0 +1,6 @@
+Big data analytics helps organizations understand large collections of information.
+Word count is a simple example of text analytics. A word count application reads text,
+splits text into words, and counts how often each word appears. Big data systems can
+process large datasets by dividing work across multiple computers. The map step emits
+word pairs, and the reduce step adds the values for each word. Word count is useful for
+search engines, document analysis, customer feedback, and social media analytics.

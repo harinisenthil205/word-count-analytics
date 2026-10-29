@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}About Word Count | WordWise{% endblock %}
+{% block content %}
+<section class="results-header">
+    <p class="eyebrow">PROJECT OVERVIEW</p>
+    <h1>Understanding <span class="gradient-text">Word Count.</span></h1>
+    <p>A foundational text-processing example used to introduce Big Data processing concepts.</p>
+</section>
+<section class="results-panel info-panel">
+    <h2>Basic concept</h2>
+    <p>Word Count calculates how many times each word appears in a text collection. It converts unstructured text into a structured list of words and frequencies.</p>
+    <h2>Processing steps</h2>
+    <ol class="steps-list">
+        <li><strong>Input:</strong> Read text from a dataset.</li>
+        <li><strong>Tokenization:</strong> Split the text into word tokens.</li>
+        <li><strong>Map:</strong> Emit each word as a key with value 1, such as (data, 1).</li>
+        <li><strong>Shuffle and sort:</strong> Group identical word keys together.</li>
+        <li><strong>Reduce:</strong> Add values for each word to calculate its total frequency.</li>
+        <li><strong>Output:</strong> Display or save the word-frequency results.</li>
+    </ol>
+    <h2>Applications</h2>
+    <ul class="applications-list">
+        <li>Search engines and indexing</li>
+        <li>Document and news analysis</li>
+        <li>Customer reviews and feedback analysis</li>
+        <li>Social media text analysis</li>
+        <li>Preprocessing for natural language processing (NLP)</li>
+    </ul>
+    <div class="note"><strong>Big Data note:</strong> This website demonstrates the Word Count logic on a single machine. Hadoop MapReduce or Apache Spark can distribute the map and reduce operations across multiple machines to process very large datasets.</div>
+</section>
+{% endblock %}
